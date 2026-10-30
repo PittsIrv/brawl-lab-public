@@ -45,6 +45,12 @@ jobs:
           npm ci
           python -m pip install -r ml/requirements.txt
           npm install --global vercel@62.1.0
+      - name: Verify Vercel deployment access
+        run: |
+          vercel whoami --scope mingxiy-cmuedus-projects --non-interactive
+          vercel project inspect brawl-lab --scope mingxiy-cmuedus-projects --non-interactive
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       - name: Verify refresh guardrails
         run: python ml/test_public_refresh.py
       - name: Verify regime, fetch data, train and export aggregates
