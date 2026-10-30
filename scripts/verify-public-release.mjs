@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const origin='https://brawl-lab-ten.vercel.app';
+const local=readFileSync('dist-public/index.html','utf8');
+const asset=local.match(/src="([^\"]+\.js)"/)?.[1];assert.ok(asset,'Build must identify a JS asset');
+const page=await fetch(origin,{cache:'no-store'});assert.equal(page.status,200);
+assert.ok((await page.text()).includes(asset),'Production must serve the newly built asset');
+const js=await fetch(new URL(asset,origin));assert.equal(js.status,200);
+const snapshot=JSON.parse(readFileSync('public-app/data/snapshot.json','utf8'));
+assert.ok((await js.text()).includes(snapshot.bundle.version),'Production must include the expected model version');
+for(const path of ['/api/player','/api/history','/api/model-maintenance','/.env.local'])assert.equal((await fetch(origin+path)).status,404,`${path} must remain unavailable`);
+console.log(`Verified public model ${snapshot.bundle.version}; private routes remain unavailable.`);

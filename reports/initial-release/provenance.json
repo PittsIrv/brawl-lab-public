@@ -1,0 +1,8 @@
+{
+  "dataset": "EliF77/brawlstars-ranked",
+  "revision": "6c1884bb693aa211ad858c5c87ecbe27b7eb693e",
+  "file": "data/season=season55/data.parquet",
+  "sha256": "3bc6b80a361314395053e6a21633d2fab080d341b1c2eb946da31ef4b0cc4e58",
+  "bytes": 211986170,
+  "license": "mit"
+}

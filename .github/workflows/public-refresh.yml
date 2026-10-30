@@ -1,0 +1,63 @@
+name: Refresh public Ranked model
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: public-model-release
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: node scripts/release-public.mjs
+  refresh:
+    needs: verify
+    if: vars.PUBLIC_REFRESH_ENABLED == 'true' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Install reviewed dependencies
+        run: |
+          npm ci
+          python -m pip install -r ml/requirements.txt
+          npm install --global vercel@62.1.0
+      - name: Verify refresh guardrails
+        run: python ml/test_public_refresh.py
+      - name: Verify regime, fetch data, train and export aggregates
+        run: python ml/public_refresh.py --data-dir "$RUNNER_TEMP/brawl-refresh"
+        env:
+          BRAWL_STARS_API_TOKEN: ${{ secrets.BRAWL_STARS_API_TOKEN }}
+          BRAWL_SEASON_PROBE_TAG: ${{ secrets.BRAWL_SEASON_PROBE_TAG }}
+      - name: Validate and stage public release
+        run: node scripts/release-public.mjs
+      - name: Publish verified static artifacts
+        working-directory: work/public-release
+        run: vercel deploy --prod --yes --scope mingxiy-cmuedus-projects --non-interactive
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      - name: Confirm public release
+        run: node scripts/verify-public-release.mjs
