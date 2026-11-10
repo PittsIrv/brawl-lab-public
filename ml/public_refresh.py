@@ -113,6 +113,7 @@ def probe_api(regime, status):
 def refresh(root, baseline, status):
     regime=baseline['regime']
     probe_api(regime,status)
+    print(json.dumps({'officialRankedSeasonId':status['officialRankedSeasonId'],'apiProbe':status['apiProbe']}),flush=True)
     news=baseline['officialNews']
     if release_links(get(news['url']).content.decode('utf-8'))!=news['releaseLinks']:
         raise RefreshBlocked('New official gameplay update detected; review the patch boundary before training.')
@@ -145,7 +146,7 @@ def refresh(root, baseline, status):
     regime=splits(regime,latest,dt.datetime.now(dt.timezone.utc))
     (root/'regime.json').write_text(json.dumps(regime))
     (root/'provenance.json').write_text(json.dumps(dict(dataset='EliF77/brawlstars-ranked',revision=revision,file=file,sha256=sha.hexdigest(),bytes=size,license='mit')))
-    run(sys.executable,'ml/prepare.py','--data-dir',str(root),'--regime',str(root/'regime.json'))
+    run(sys.executable,'ml/prepare.py','--data-dir',str(root),'--regime',str(root/'regime.json'),'--skip-time-stats')
     run(sys.executable,'ml/train.py','--data-dir',str(root),'--output',str(root/'candidate.json'))
     candidate=json.loads((root/'candidate.json').read_text())
     if not any(m['status']=='ready' for m in candidate['models'].values()):

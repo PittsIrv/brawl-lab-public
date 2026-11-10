@@ -9,7 +9,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 from time_stats import write_time_stats
 
-p=argparse.ArgumentParser();p.add_argument('--data-dir',required=True);p.add_argument('--regime',default='ml/regime.json');p.add_argument('--catalog',default='lib/data/brawlers.json');p.add_argument('--win-time-history',action='store_true',help='Write private longitudinal inputs beside the raw data; never publish this NPZ');args=p.parse_args();root=Path(args.data_dir);regime=json.load(open(args.regime))
+p=argparse.ArgumentParser();p.add_argument('--data-dir',required=True);p.add_argument('--regime',default='ml/regime.json');p.add_argument('--catalog',default='lib/data/brawlers.json');p.add_argument('--skip-time-stats',action='store_true',help='Prepare draft inputs without the independent historical activity analysis');p.add_argument('--win-time-history',action='store_true',help='Write private longitudinal inputs beside the raw data; never publish this NPZ');args=p.parse_args();root=Path(args.data_dir);regime=json.load(open(args.regime))
 cat=json.load(open(args.catalog));canon=lambda s:re.sub('[^A-Z0-9]','',str(s).upper());lookup={canon(b['name']):b for b in cat}
 roster=sorted(cat,key=lambda b:b['id']);by_name={canon(b['name']):i for i,b in enumerate(roster)}
 columns=['battle_time','mode','map','record']+[f't{t}_b{i}_{f}' for t in [1,2] for i in range(3) for f in ['name','tag','power','elo']]
@@ -74,7 +74,7 @@ if args.win_time_history:
 # original label-independent 25% draft/activity sample without changing release inputs.
 d=d[(d.key%100)<25]
 # Timing must precede split gaps and model caps, which distort activity counts.
-write_time_stats(d, regime, root)
+if not args.skip_time_stats:write_time_stats(d, regime, root)
 # Absolute UTC chronological boundaries, with gaps to separate adjacent battles/sets.
 splits={'train':d.time<regime['trainEnd'],'validation':(d.time>=regime['validationStart'])&(d.time<regime['validationEnd']),'test':d.time>=regime['testStart']}
 map_keys=sorted(set(zip(d['mode'],d['map'])));map_ids={k:i for i,k in enumerate(map_keys)};mode_names=sorted(d['mode'].unique());mode_ids={k:i for i,k in enumerate(mode_names)}
