@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "checkedAt": "2026-11-10T15:10:06.779169+00:00",
+  "status": "blocked",
+  "reason": "The current source ends on November 6 and is more than 72 hours old. Waiting for fresh matches from the November 3 patch.",
+  "patch": "2026-11-03",
+  "trainingStart": "20261104T000000.000Z",
+  "patchVerified": false,
+  "sourceLatestMatch": "20261106T023530.000Z",
+  "sourceRevision": "f49a208cbc6a00dcfebfc0fba92ccc6b540ee73f",
+  "officialRankedSeasonId": null,
+  "apiProbe": {
+    "status": "unavailable",
+    "rankedRecords": 0,
+    "draftFields": []
+  }
+}

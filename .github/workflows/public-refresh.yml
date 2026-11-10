@@ -53,7 +53,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       - name: Verify refresh guardrails
         run: python ml/test_public_refresh.py
-      - name: Verify regime, fetch data, train and export aggregates
+      - name: Check current patch and publish model or explicit waiting status
         run: python ml/public_refresh.py --data-dir "$RUNNER_TEMP/brawl-refresh"
         env:
           BRAWL_STARS_API_TOKEN: ${{ secrets.BRAWL_STARS_API_TOKEN }}

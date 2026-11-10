@@ -15,3 +15,34 @@ Configure credentials directly in GitHub, never in source or chat. Set repositor
 Official news/release-note text changes stop the job for review. Source data older than 72 hours, new Ranked season, roster changes, failed optimizer convergence or failed validation also stop release. Reviewed regime evidence lives in `ml/public-refresh-baseline.json`. Never alter its timestamp merely to silence an expiry warning. The historical win-window experiment retains its own original dates.
 
 The workflow uploads only audited compiled output, never raw training records or server secrets. Enable GitHub Actions failure notifications so stopped refreshes are visible. A saved schedule alone does not prove unattended deployment works.
+
+## November 10 current-patch recovery
+
+The reviewed November 3 update replaces the September baseline. Eligible matches
+start November 4 00:00 UTC, conservatively excluding the entire release day because
+the maintenance completion timestamp is not independently established. The job
+verifies the official Ranked season separately; provider season55 is not that ID.
+Training starts from scratch with no earlier weights, uses only the reviewed patch
+and season, and caps the window at 21 days. Time-separated validation/test days
+and release gates remain required. No older patch is used to fill sparse tiers.
+
+The public provider revision f49a208cbc6a00dcfebfc0fba92ccc6b540ee73f contains
+6,399,077 rows, ends November 6 02:35:30 UTC, and has 742,488 raw rows dated
+November 4 onward. These are not yet filtered/deduplicated training counts. It is
+stale on November 10 and supplies only two complete eligible days. No current
+model can honestly be released from that snapshot under the existing gates.
+
+Expected upstream blockers now publish a status-only release with the reason and
+last attempt date, while disabling all archived model recommendations. They retry
+daily. Unexpected processing/build/deployment errors still fail CI. The UI also
+marks the status overdue after 36 hours, so a status release cannot hide an outage.
+
+The official news check compares gameplay-update links inside main, not promotional
+copy or navigation. Reviewed release notes are hashed inside main; gameplay edits
+still require review. This is not fully automatic patch interpretation.
+
+The November notes describe picks/bans in the game Battle Log, not a developer API
+contract. The current parquet and provider documentation contain no bans/order.
+Each cloud run probes the official battle log, emitting only a count of Ranked
+records and recognized draft-field names, never tags, values, or raw responses.
+A missing field in a small sample does not prove universal API absence.
