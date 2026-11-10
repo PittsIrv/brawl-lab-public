@@ -1,23 +1,23 @@
 {
-  "reviewedAt": "2026-10-30",
+  "reviewedAt": "2026-11-10",
   "regime": {
     "rankedSeasonId": 50,
     "rankedSeasonEvidence": "Official API via private maintenance endpoint confirmed Ranked season 50 on 2026-10-30; automated runs recheck through official API proxy.",
-    "balancePatchId": "2026-09-16",
-    "balancePatchSource": "https://supercell.com/en/games/brawlstars/blog/release-notes/release-notes-august-2026/",
-    "balancePatchNote": "Latest balance maintenance found in official release notes at the 2026-10-27 check. Patch detection is not instantaneous.",
+    "balancePatchId": "2026-11-03",
+    "balancePatchSource": "https://supercell.com/en/games/brawlstars/blog/game-updates/release-notes-november-2026/",
+    "balancePatchNote": "November 3 official update. Exclude the entire release date because maintenance completion time is not independently verified.",
     "sourcePartition": "season55",
     "localFile": "season55.parquet",
-    "start": "20261015T090000.000Z",
-    "end": "20261119T090000.000Z",
-    "trainEnd": "20261024T000000.000Z",
-    "validationStart": "20261024T020000.000Z",
-    "validationEnd": "20261025T120000.000Z",
-    "testStart": "20261026T000000.000Z",
-    "verifiedAt": "2026-10-27T14:46:49.000Z"
+    "start": "20261104T000000.000Z",
+    "end": "20261119T090000.000Z"
   },
-  "officialPages": {
-    "https://supercell.com/en/games/brawlstars/blog/": "033691515077a5e6b9ebec203691bde7ee3886d939fdea6ff5299f093ae320d5",
-    "https://supercell.com/en/games/brawlstars/blog/release-notes/release-notes-august-2026/": "c5cc57d92f2ff60e5272409f976f372c5ea5b4172c5355a39235961a8f598f60"
+  "officialArticles": {
+    "https://supercell.com/en/games/brawlstars/blog/game-updates/release-notes-november-2026/": "a2a838be843b292e6044e5ff0ce94bbeb8721cdbc68af61acf457063d601597d"
+  },
+  "officialNews": {
+    "url": "https://supercell.com/en/games/brawlstars/blog/",
+    "releaseLinks": [
+      "https://supercell.com/en/games/brawlstars/blog/game-updates/release-notes-november-2026/"
+    ]
   }
 }
