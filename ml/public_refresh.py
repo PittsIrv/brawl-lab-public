@@ -59,15 +59,26 @@ def run(*args):
 
 def splits(regime, latest, now):
     last=dt.datetime.strptime(latest,'%Y%m%dT%H%M%S.%fZ').replace(tzinfo=dt.timezone.utc)
-    if not dt.timedelta(0)<=now-last<=dt.timedelta(hours=72):
-        raise RefreshBlocked('Source match data is more than 72 hours old or future-dated; waiting for fresh current-patch matches.')
+    if not dt.timedelta(0)<=now-last<=dt.timedelta(days=7):
+        raise RefreshBlocked('Source match data is more than seven days old or future-dated; waiting for fresh current-patch matches.')
     end=last.replace(hour=0,minute=0,second=0,microsecond=0)
     fmt=lambda d:d.strftime('%Y%m%dT%H%M%S.000Z')
     if fmt(end)>regime['end']: raise RefreshBlocked('Source extends beyond the verified Ranked regime.')
     regime=dict(regime,start=max(regime['start'],fmt(end-dt.timedelta(days=21))))
-    train_end=end-dt.timedelta(days=2,hours=2)
-    if fmt(train_end-dt.timedelta(days=1))<=regime['start']: raise RefreshBlocked('Waiting for enough complete current-patch days for separate training, validation and test windows.')
-    return dict(regime,end=fmt(end),trainEnd=fmt(train_end),validationStart=fmt(end-dt.timedelta(days=2)),validationEnd=fmt(end-dt.timedelta(days=1,hours=2)),testStart=fmt(end-dt.timedelta(days=1)),verifiedAt=now.isoformat())
+    # Prefer full-day holdouts. Early in a patch, two complete days support
+    # fixed 10-hour validation and 12-hour test windows with two-hour gaps.
+    if fmt(end-dt.timedelta(days=4))>=regime['start']:
+        train_end=end-dt.timedelta(days=2,hours=2)
+        val_start=end-dt.timedelta(days=2);val_end=end-dt.timedelta(days=1,hours=2)
+        test_start=end-dt.timedelta(days=1)
+    elif fmt(end-dt.timedelta(days=2))>=regime['start']:
+        train_end=end-dt.timedelta(days=1,hours=2)
+        val_start=end-dt.timedelta(days=1);val_end=end-dt.timedelta(hours=14)
+        test_start=end-dt.timedelta(hours=12)
+    else:
+        raise RefreshBlocked('Waiting for two complete current-patch days for separate training, validation and test windows.')
+    return dict(regime,end=fmt(end),trainEnd=fmt(train_end),validationStart=fmt(val_start),validationEnd=fmt(val_end),testStart=fmt(test_start),verifiedAt=now.isoformat(),sourceLatestMatch=latest)
+
 
 def probe_api(regime, status):
     token=os.environ['BRAWL_STARS_API_TOKEN']; tag=os.environ['BRAWL_SEASON_PROBE_TAG'].strip().lstrip('#')

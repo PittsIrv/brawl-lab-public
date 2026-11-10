@@ -16,7 +16,7 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual(r['trainEnd'],'20261027T220000.000Z')
         self.assertEqual(self.regime['end'],'20261119T090000.000Z')
     def test_stale_future_and_new_regime_rejected(self):
-        for latest in ('20261026T000000.000Z','20261031T000000.000Z'):
+        for latest in ('20261022T000000.000Z','20261031T000000.000Z'):
             with self.assertRaises(ValueError): splits(self.regime,latest,self.now)
         with self.assertRaises(ValueError): splits(dict(self.regime,end='20261029T000000.000Z'),'20261030T014920.000Z',self.now)
     def test_content_fingerprint(self):
@@ -32,6 +32,17 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual(r['start'],'20261020T000000.000Z')
         with self.assertRaises(RefreshBlocked):
             splits({'start':'20261109T000000.000Z','end':'20261119T090000.000Z'},'20261110T014920.000Z',now)
+
+    def test_early_patch_holdouts_remain_separate(self):
+        now=dt.datetime(2026,11,10,12,tzinfo=dt.timezone.utc)
+        r=splits({'start':'20261104T000000.000Z','end':'20261119T090000.000Z'},'20261106T023530.000Z',now)
+        self.assertEqual(r['trainEnd'],'20261104T220000.000Z')
+        self.assertEqual(r['validationStart'],'20261105T000000.000Z')
+        self.assertEqual(r['validationEnd'],'20261105T100000.000Z')
+        self.assertEqual(r['testStart'],'20261105T120000.000Z')
+        self.assertLess(r['start'],r['trainEnd'])
+        with self.assertRaises(RefreshBlocked):
+            splits(r,'20261106T023530.000Z',dt.datetime(2026,11,13,3,tzinfo=dt.timezone.utc))
 
     def test_news_ignores_promotions_but_detects_gameplay_links(self):
         a='<main><a href="/release-notes-november/">Notes</a><p>Promotion A</p></main>'

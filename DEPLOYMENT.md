@@ -46,3 +46,23 @@ contract. The current parquet and provider documentation contain no bans/order.
 Each cloud run probes the official battle log, emitting only a count of Ranked
 records and recognized draft-field names, never tags, values, or raw responses.
 A missing field in a small sample does not prove universal API absence.
+
+### Revised current-patch evidence policy
+
+Upstream scheduled Ingest run 42730192972 on November 10 skipped ingestion because
+season55 was past its seven-day opening window. Waiting for the daily collector
+is therefore not a freshness strategy. The public consumer cannot change that
+external schedule.
+
+For the current-patch candidate, use an explicit seven-day maximum source age,
+replacing the original arbitrary 72-hour check. This permits a NEW model fitted
+only on November 4-6 matches; it does not renew the pre-patch model. Model expiry
+is the earlier of build+3 days and newest-source-match+7 days. With two complete
+patch days, use fixed chronological boundaries: train through November 4 22:00,
+validate November 5 00:00-10:00, test November 5 12:00-24:00 UTC. Two-hour gaps,
+minimum sample counts, calibration and held-out quality gates remain unchanged.
+With four complete patch days, use the existing full-day holdouts. The rule is
+chosen before looking at outcomes. If the candidate fails, publish the blocker.
+The earlier 72-hour/two-day blocker description above documents the initial
+investigation, not this revised policy. Continuing beyond November 13 02:35:30
+UTC requires newer source matches; no build can extend that deadline.
