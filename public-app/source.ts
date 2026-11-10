@@ -1,5 +1,5 @@
 import snapshot from './data/snapshot.json';
-import {refreshStatus} from './refresh-status';
+import refreshStatus from './data/refresh-status.json';
 import {staleReason,validateBundle,type Bundle,type ModelState} from '@/lib/final-pick';
 import {validateMapStats,type MapGuideData,type MapStats} from '@/lib/map-guide';
 import {draftAdvice} from '@/lib/draft-advice';
